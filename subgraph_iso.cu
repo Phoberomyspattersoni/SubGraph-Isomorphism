@@ -304,13 +304,13 @@ int* kernel_collect(bool *c_set, int width, int u, int *cand_count) {
 
 	int blocks_grid = (width + BLOCK_SIZE1D - 1) / BLOCK_SIZE1D;
 
-	thrust::device_ptr<int> prefix_sum = thrust::device_malloc<int>(2);
-	prefix_sum[0] = prefix_sum[1] = 0;
+	thrust::device_ptr<int> prefix_sum = thrust::device_malloc<int>(width + 1);
+	prefix_sum[0] = 0;
 	
 	thrust::device_ptr<bool> dev_ptr((bool*)((char*)c_set + u * h_pitch));
        	
 	/* Prefix scan */
-        thrust::inclusive_scan(thrust::device, prefix_sum, prefix_sum + 2, prefix_sum);
+        thrust::inclusive_scan(thrust::device, dev_ptr, dev_ptr + width, prefix_sum + 1);
 	
        	*cand_count = prefix_sum[width];
 	
